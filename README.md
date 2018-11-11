@@ -29,6 +29,24 @@ run JumpingSumoSample
 JumpingSumoSample
 ```
 
+build sumosh
+```
+cd ~/Desktop/robot/parrot
+git clone https://github.com/esmanchik/parrot.git esmanchik
+cd esmanchik/sumosh
+mkdir cmake-build-debug
+cd cmake-build-debug
+cmake ..
+make
+```
+run sumosh
+```
+cd ~/Desktop/robot/parrot/esmanchik/sumosh/cmake-build-debug
+mkdir frames
+. ~/Desktop/robot/parrot/sdk/out/arsdk-native/staging/native-wrapper.sh
+./sumosh
+```
+
 ## Configure CLion
 Assuming your home directory is /home/sasha
 
