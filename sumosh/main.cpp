@@ -32,6 +32,57 @@ void stateChanged (eARCONTROLLER_DEVICE_STATE newState, eARCONTROLLER_ERROR erro
 
 }
 
+void batteryStateChanged (uint8_t percent)
+{
+    // callback of changing of battery level
+    std::cout << (unsigned)percent << "% of battery left" << std::endl;
+}
+
+// called when a command has been received from the drone
+void commandReceived (eARCONTROLLER_DICTIONARY_KEY commandKey, ARCONTROLLER_DICTIONARY_ELEMENT_t *elementDictionary, void *customData)
+{
+    ARCONTROLLER_Device_t *deviceController = (ARCONTROLLER_Device_t *)customData;
+
+    if (deviceController == NULL)
+        return;
+    // if the command received is a battery state changed
+    if (commandKey == ARCONTROLLER_DICTIONARY_KEY_COMMON_COMMONSTATE_BATTERYSTATECHANGED)
+    {
+        ARCONTROLLER_DICTIONARY_ARG_t *arg = NULL;
+        ARCONTROLLER_DICTIONARY_ELEMENT_t *singleElement = NULL;
+
+        if (elementDictionary != NULL)
+        {
+            // get the command received in the device controller
+            HASH_FIND_STR (elementDictionary, ARCONTROLLER_DICTIONARY_SINGLE_KEY, singleElement);
+
+            if (singleElement != NULL)
+            {
+                // get the value
+                HASH_FIND_STR (singleElement->arguments, ARCONTROLLER_DICTIONARY_KEY_COMMON_COMMONSTATE_BATTERYSTATECHANGED_PERCENT, arg);
+
+                if (arg != NULL)
+                {
+                    // update UI
+                    batteryStateChanged (arg->value.U8);
+                }
+                else
+                {
+                    ARSAL_PRINT(ARSAL_PRINT_ERROR, TAG, "arg is NULL");
+                }
+            }
+            else
+            {
+                ARSAL_PRINT(ARSAL_PRINT_ERROR, TAG, "singleElement is NULL");
+            }
+        }
+        else
+        {
+            ARSAL_PRINT(ARSAL_PRINT_ERROR, TAG, "elements is NULL");
+        }
+    }
+}
+
 struct CallbackData {
     int frameNb = 0;
 };
@@ -85,6 +136,11 @@ int main() {
                 if (error != ARCONTROLLER_OK)
                 {
                     ARSAL_PRINT (ARSAL_PRINT_ERROR, TAG, "add State callback failed.");
+                }
+                error = ARCONTROLLER_Device_AddCommandReceivedCallback (deviceController, commandReceived, deviceController);
+                if (error != ARCONTROLLER_OK)
+                {
+                    ARSAL_PRINT (ARSAL_PRINT_ERROR, TAG, "add callback failed.");
                 }
                 error = ARCONTROLLER_Device_SetVideoStreamCallbacks(deviceController, decoderConfigCallback, didReceiveFrameCallback, NULL , &cbd);
                 if (error != ARCONTROLLER_OK)
