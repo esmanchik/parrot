@@ -22,8 +22,8 @@ int main() {
 
     JumpingSumo sumo{};
     auto createTracker = []() {
-        return TrackerMedianFlow::create();
-        //return TrackerKCF::create();
+        //return TrackerMedianFlow::create();
+        return TrackerKCF::create();
     };
     Ptr<Tracker> tracker = createTracker();
     atomic_bool running {true};
@@ -117,7 +117,7 @@ int main() {
             }
             auto box = nextFrame.release();
             hasFrame.store(false, memory_order_release);
-            force = 0;
+            force = 0; udelay = 100;
             bool rotate = false;
             auto boxMid = box->x + box->width / 2;
             if (boxMid < middle - 10) {
@@ -131,6 +131,7 @@ int main() {
             if (!rotate) {
                 if (box->width > 300) force = -90;
                 if (box->width < 200) force = 90;
+                if (force > 0) udelay = 500;
             }
             if (force == 0 || frames % 10 != 0) continue;
             error = deviceController->jumpingSumo->setPilotingPCMDFlag(deviceController->jumpingSumo, 1);
