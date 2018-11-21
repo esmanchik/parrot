@@ -30,6 +30,12 @@ int main() {
 
     JumpingSumo::LoopLambda loop = [](ARCONTROLLER_Device_t *deviceController) {
         eARCONTROLLER_ERROR error;
+        auto errorOccured = [&error]() {
+            if (error != ARCONTROLLER_OK) {
+                ARSAL_PRINT(ARSAL_PRINT_ERROR, TAG, "\n- command error :%s", ARCONTROLLER_Error_ToString(error));
+            }
+            return error != ARCONTROLLER_OK;
+        };
         int force = 0, udelay = 500;
         string command;
         cin >> command;
@@ -43,39 +49,24 @@ int main() {
                     type = ARCOMMANDS_JUMPINGSUMO_PILOTING_POSTURE_TYPE_KICKER;
                 }
                 error = deviceController->jumpingSumo->sendPilotingPosture(deviceController->jumpingSumo, type);
-                if (error != ARCONTROLLER_OK) {
-                    ARSAL_PRINT(ARSAL_PRINT_ERROR, TAG, "\n- command error :%s", ARCONTROLLER_Error_ToString(error));
-                    break;
-                }
+                if (errorOccured()) break;
             } else {
                 cin >> force >> udelay;
                 ARSAL_PRINT(ARSAL_PRINT_INFO, TAG, "Doing %s with %d ...", command.c_str(), force);
                 error = deviceController->jumpingSumo->setPilotingPCMDFlag(deviceController->jumpingSumo, 1);
-                if (error != ARCONTROLLER_OK) {
-                    ARSAL_PRINT(ARSAL_PRINT_ERROR, TAG, "\n- command error :%s", ARCONTROLLER_Error_ToString(error));
-                    break;
-                }
+                if (errorOccured()) break;
                 if (command.substr(0, 1) == "t")
                     error = deviceController->jumpingSumo->setPilotingPCMDTurn(deviceController->jumpingSumo, force);
                 else
                     error = deviceController->jumpingSumo->setPilotingPCMDSpeed(deviceController->jumpingSumo, force);
-                if (error != ARCONTROLLER_OK) {
-                    ARSAL_PRINT(ARSAL_PRINT_ERROR, TAG, "\n- command error :%s", ARCONTROLLER_Error_ToString(error));
-                    break;
-                }
+                if (errorOccured()) break;
                 usleep(udelay * 1000);
                 error = deviceController->jumpingSumo->setPilotingPCMDFlag(deviceController->jumpingSumo, 0);
-                if (error != ARCONTROLLER_OK) {
-                    ARSAL_PRINT(ARSAL_PRINT_ERROR, TAG, "- command error :%s", ARCONTROLLER_Error_ToString(error));
-                }
+                if (errorOccured()) break;
                 error = deviceController->jumpingSumo->setPilotingPCMDSpeed(deviceController->jumpingSumo, 0);
-                if (error != ARCONTROLLER_OK) {
-                    ARSAL_PRINT(ARSAL_PRINT_ERROR, TAG, "- command error :%s", ARCONTROLLER_Error_ToString(error));
-                }
+                if (errorOccured()) break;
                 error = deviceController->jumpingSumo->setPilotingPCMDTurn(deviceController->jumpingSumo, 0);
-                if (error != ARCONTROLLER_OK) {
-                    ARSAL_PRINT(ARSAL_PRINT_ERROR, TAG, "- command error :%s", ARCONTROLLER_Error_ToString(error));
-                }
+                if (errorOccured()) break;
                 ARSAL_PRINT(ARSAL_PRINT_INFO, TAG, ".....done");
             }
             command = "";
