@@ -50,6 +50,11 @@ int main() {
                 }
                 error = deviceController->jumpingSumo->sendPilotingPosture(deviceController->jumpingSumo, type);
                 if (errorOccured()) break;
+            } else if (command.substr(0, 1) == "l") {
+                int intensity;
+                cin >> intensity;
+                error = deviceController->common->sendHeadlightsIntensity(deviceController->common, intensity, intensity);
+                if (errorOccured()) break;
             } else {
                 cin >> force >> udelay;
                 ARSAL_PRINT(ARSAL_PRINT_INFO, TAG, "Doing %s with %d ...", command.c_str(), force);
