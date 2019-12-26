@@ -18,8 +18,8 @@ build Parrot SDK and JumpingSumoSample
 ```
 sudo apt-get install -y \
     git build-essential autoconf libtool \
-    python python3 libavahi-client-dev libavcodec-dev \
-    libavformat-dev libswscale-dev libncurses5-dev mplayer
+    python python3 zlib1g-dev libavahi-client-dev \
+     libavcodec-dev libavformat-dev libswscale-dev libncurses5-dev mplayer
 ./build.sh -p arsdk-native -t build-sdk -j
 ./build.sh -p arsdk-native -t build-sample-JumpingSumoSample -j    
 ```
