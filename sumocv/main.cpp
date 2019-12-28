@@ -34,7 +34,7 @@ int main() {
 
     JumpingSumo::FrameLambda onFrame = [createTracker, &tracker, &running, &frames, &hasFrame, &nextFrame, &failures](const JumpingSumo::Bytes &bytes) {
         Mat jpeg(1, bytes.size(), CV_8UC1, (void*)bytes.data());
-        Mat frame = imdecode(jpeg, CV_LOAD_IMAGE_COLOR);
+        Mat frame = imdecode(jpeg, IMREAD_COLOR);
 
         // Define initial bounding box
         Rect2d bbox(300, 100, 200, 200);

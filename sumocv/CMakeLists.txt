@@ -4,7 +4,7 @@ project(sumocv)
 set(CMAKE_CXX_STANDARD 11)
 set(PARROT_SDK_HOME $ENV{HOME}/Desktop/robot/parrot/sdk)
 
-find_package(OpenCV REQUIRED)
+find_package(OpenCV 4.2.0 EXACT REQUIRED PATHS /home/sasha/Desktop/cv/opencv4.2.0-debug)
 
 add_library(libsumo SHARED ${CMAKE_CURRENT_SOURCE_DIR}/../libsumo/JumpingSumo.cpp)
 
