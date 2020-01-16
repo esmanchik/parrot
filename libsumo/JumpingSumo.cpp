@@ -14,11 +14,12 @@ void batteryStateChanged (uint8_t percent)
 }
 
 // called when a command has been received from the drone
-void commandReceived (eARCONTROLLER_DICTIONARY_KEY commandKey, ARCONTROLLER_DICTIONARY_ELEMENT_t *elementDictionary, void *customData)
+void JumpingSumo::commandReceivedProxy (eARCONTROLLER_DICTIONARY_KEY commandKey, ARCONTROLLER_DICTIONARY_ELEMENT_t *elementDictionary, void *customData)
 {
-    ARCONTROLLER_Device_t *deviceController = (ARCONTROLLER_Device_t *)customData;
+    auto sumo = static_cast<JumpingSumo *>(customData);
+    ARCONTROLLER_Device_t *deviceController = sumo->deviceController;
 
-    if (deviceController == NULL)
+    if (deviceController == nullptr)
         return;
     // if the command received is a battery state changed
     if (commandKey == ARCONTROLLER_DICTIONARY_KEY_COMMON_COMMONSTATE_BATTERYSTATECHANGED)
@@ -39,7 +40,7 @@ void commandReceived (eARCONTROLLER_DICTIONARY_KEY commandKey, ARCONTROLLER_DICT
                 if (arg != NULL)
                 {
                     // update UI
-                    batteryStateChanged (arg->value.U8);
+                    batteryStateChanged (sumo->batteryPercent = arg->value.U8);
                 }
                 else
                 {
@@ -77,13 +78,14 @@ void JumpingSumo::start() {
         if (errorDiscovery == ARDISCOVERY_OK) {
             eARCONTROLLER_ERROR error = ARCONTROLLER_OK;
             ARCONTROLLER_Device_t *deviceController = ARCONTROLLER_Device_New(device, &error);
+            this->deviceController = deviceController;
             if (error == ARCONTROLLER_OK) {
                 error = ARCONTROLLER_Device_AddStateChangedCallback(deviceController, stateChangedProxy, this);
                 if (error != ARCONTROLLER_OK)
                 {
                     ARSAL_PRINT (ARSAL_PRINT_ERROR, TAG, "add State callback failed.");
                 }
-                error = ARCONTROLLER_Device_AddCommandReceivedCallback (deviceController, commandReceived, deviceController);
+                error = ARCONTROLLER_Device_AddCommandReceivedCallback (deviceController, commandReceivedProxy, this);
                 if (error != ARCONTROLLER_OK)
                 {
                     ARSAL_PRINT (ARSAL_PRINT_ERROR, TAG, "add callback failed.");
