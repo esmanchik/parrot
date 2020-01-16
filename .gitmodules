@@ -1,0 +1,3 @@
+[submodule "wsumo/libwebsockets"]
+	path = wsumo/libwebsockets
+	url = https://github.com/warmcat/libwebsockets.git
