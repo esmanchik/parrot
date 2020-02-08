@@ -7,7 +7,6 @@ set(PARROT_SDK_HOME $ENV{HOME}/Desktop/robot/parrot/sdk)
 add_library(libsumo SHARED ${CMAKE_CURRENT_SOURCE_DIR}/../libsumo/JumpingSumo.cpp)
 
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/../libsumo)
-include_directories(${CMAKE_CURRENT_SOURCE_DIR}/websocketpp)
 include_directories(${PARROT_SDK_HOME}/out/arsdk-native/staging/usr/include)
 link_directories(${PARROT_SDK_HOME}/out/arsdk-native/staging/usr/lib)
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/libwebsockets/cmake-build-debug/include)
