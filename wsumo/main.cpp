@@ -1,3 +1,4 @@
+#include <opencv2/opencv.hpp>
 #include <iostream>
 #include <vector>
 #include <sstream>
@@ -192,7 +193,22 @@ callback_minimal_broker(struct lws *wsi, enum lws_callback_reasons reason,
             if (pss->send_a_ping > 0) {
                 pss->send_a_ping = 0;
                 auto& frame = frames[activeFrame];
-                base64Frame = base64_encode(frame.data(),  frame.size());
+                cv::Mat jpeg = cv::imdecode(cv::Mat(frame), cv::IMREAD_COLOR); // cv::IMREAD_UNCHANGED
+                std::cout << jpeg.size << std::endl;
+                std::vector<uchar> packet;//buffer for coding
+                if (jpeg.empty()) packet = frame;
+                else {
+                    cv::Mat dst = jpeg;
+                    //cv::cvtColor(dst, dst, cv::COLOR_BGR2GRAY);
+                    cv::resize(dst, dst, cv::Size(320, 240)); // 160, 120
+                    std::cout << dst.size << std::endl;
+                    std::vector<int> param(2);
+                    param[0] = cv::IMWRITE_JPEG_QUALITY;
+                    param[1] = 80;//default(95) 0-100
+
+                    cv::imencode(".jpg", dst, packet, param);
+                }
+                base64Frame = base64_encode(packet.data(),  packet.size());
                 int packets = base64Frame.length() / packsize + ((base64Frame.length() % packsize > 0) ? 1 : 0);
                 pss->number = 0;
                 pss->of = packets;
